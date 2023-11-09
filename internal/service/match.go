@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"log"
 	"math/rand"
 	"strconv"
@@ -11,6 +10,8 @@ import (
 	nutsutil "github.com/CoulsonChen/BitoAPI/third-party/nutsdb"
 	"github.com/nutsdb/nutsdb"
 )
+
+var bucket = "Match"
 
 type MatchService struct {
 	nuts *nutsdb.DB
@@ -30,19 +31,14 @@ func GetMatchServiceInstance() *MatchService {
 
 func (svc *MatchService) AddPerson(person model.Person) int {
 	person.Id = rand.Int()
-	bucket := "Male"
+	key := []byte("Male")
 	if person.Gender == constant.Female {
-		bucket = "Female"
+		key = []byte("Female")
 	}
-	val, err := json.Marshal(person)
-	if err != nil {
-		log.Fatal(err)
-		return 0
-	}
+	val := []byte(strconv.Itoa(person.Id))
 
 	if err := svc.nuts.Update(
 		func(tx *nutsdb.Tx) error {
-			key := []byte(strconv.Itoa(person.Id))
 			return tx.ZAdd(bucket, key, person.Height, val)
 		}); err != nil {
 		log.Fatal(err)
