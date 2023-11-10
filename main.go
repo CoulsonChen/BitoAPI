@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/CoulsonChen/BitoAPI/api"
 	"github.com/CoulsonChen/BitoAPI/internal/service"
-	"github.com/CoulsonChen/BitoAPI/third-party/nutsdb"
+	"github.com/CoulsonChen/BitoAPI/third-party/redis"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +19,7 @@ import (
 // @BasePath /v1
 func main() {
 	// storage initialize
-	nutsdb.Initial()
+	redis.Initial()
 	// service initialize
 	service.InitMatchService()
 

@@ -1,0 +1,10 @@
+version: '3'
+services:
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=your_password
+      - REDIS_DATABASE=1
+      - REDIS_BIND=0.0.0.0

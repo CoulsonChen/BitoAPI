@@ -1,5 +1,24 @@
-basePath: /v2
+basePath: /v1
 definitions:
+  constant.Gender:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - Male
+    - Female
+  model.Person:
+    properties:
+      dates:
+        type: integer
+      gender:
+        $ref: '#/definitions/constant.Gender'
+      height:
+        type: number
+      name:
+        type: string
+    type: object
   web.APIError:
     properties:
       errorCode:
@@ -19,17 +38,46 @@ info:
   title: Swagger API
   version: "1.0"
 paths:
-  /testapi/get-string-by-int/{some_id}:
-    get:
+  /Match/{person_id}/{person_to_match_id}:
+    put:
+      consumes:
+      - application/json
+      description: Match people
+      parameters:
+      - description: Person ID
+        in: path
+        name: person_id
+        required: true
+        type: integer
+      - description: Person-to-match ID
+        in: path
+        name: person_to_match_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/web.APIError'
+      summary: Match people
+  /Match/NewPerson:
+    post:
       consumes:
       - application/json
       description: get string by ID
       parameters:
-      - description: Some ID
-        in: path
-        name: some_id
+      - description: Person
+        in: body
+        name: Name
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/model.Person'
       produces:
       - application/json
       responses:
@@ -46,25 +94,42 @@ paths:
           schema:
             $ref: '#/definitions/web.APIError'
       summary: Add a new pet to the store
-  /testapi/get-struct-array-by-string/{some_id}:
+  /Match/QueryMatches/{person_id}:
     get:
       consumes:
       - application/json
-      description: get struct array by ID
+      description: Query matches for person
       parameters:
-      - description: Some ID
+      - description: Person ID
         in: path
-        name: some_id
-        required: true
-        type: string
-      - description: Offset
-        in: query
-        name: offset
+        name: person_id
         required: true
         type: integer
-      - description: Limit
+      - description: Top N Matches
         in: query
-        name: limit
+        name: top_n
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/web.APIError'
+      summary: Query matches for person
+  /Match/Remove/{person_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove person from sorted set
+      parameters:
+      - description: Person ID
+        in: path
+        name: person_id
         required: true
         type: integer
       produces:
@@ -78,8 +143,5 @@ paths:
           description: We need ID!!
           schema:
             $ref: '#/definitions/web.APIError'
-        "404":
-          description: Can not find ID
-          schema:
-            $ref: '#/definitions/web.APIError'
+      summary: Remove person from sorted set
 swagger: "2.0"

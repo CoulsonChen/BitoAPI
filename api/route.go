@@ -1,10 +1,10 @@
 package api
 
 import (
+	_ "github.com/CoulsonChen/BitoAPI/docs"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	_ "github.com/swaggo/gin-swagger/example/basic/docs"
 )
 
 func SetRouting(route *gin.Engine) {
@@ -12,6 +12,9 @@ func SetRouting(route *gin.Engine) {
 	{
 		match := v1.Group("/Match")
 		match.POST("/NewPerson", AddSinglePersonAndMatch)
+		match.DELETE("/Remove/:id", RemovePerson)
+		match.GET("/QueryMatches/:id", QueryMatches)
+		match.PUT("/:id/:idm", Match)
 	}
 }
 

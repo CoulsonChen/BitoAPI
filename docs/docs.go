@@ -22,8 +22,8 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/testapi/get-string-by-int/{some_id}": {
-            "get": {
+        "/Match/NewPerson": {
+            "post": {
                 "description": "get string by ID",
                 "consumes": [
                     "application/json"
@@ -34,11 +34,13 @@ const docTemplate = `{
                 "summary": "Add a new pet to the store",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Some ID",
-                        "name": "some_id",
-                        "in": "path",
-                        "required": true
+                        "description": "Person",
+                        "name": "Name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Person"
+                        }
                     }
                 ],
                 "responses": {
@@ -63,35 +65,63 @@ const docTemplate = `{
                 }
             }
         },
-        "/testapi/get-struct-array-by-string/{some_id}": {
+        "/Match/QueryMatches/{person_id}": {
             "get": {
-                "description": "get struct array by ID",
+                "description": "Query matches for person",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+                "summary": "Query matches for person",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Some ID",
-                        "name": "some_id",
+                        "type": "integer",
+                        "description": "Person ID",
+                        "name": "person_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "Offset",
-                        "name": "offset",
-                        "in": "query",
-                        "required": true
+                        "description": "Top N Matches",
+                        "name": "top_n",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/web.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/Match/Remove/{person_id}": {
+            "delete": {
+                "description": "Remove person from sorted set",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Remove person from sorted set",
+                "parameters": [
                     {
                         "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query",
+                        "description": "Person ID",
+                        "name": "person_id",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -107,9 +137,45 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/web.APIError"
                         }
+                    }
+                }
+            }
+        },
+        "/Match/{person_id}/{person_to_match_id}": {
+            "put": {
+                "description": "Match people",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Match people",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Person ID",
+                        "name": "person_id",
+                        "in": "path",
+                        "required": true
                     },
-                    "404": {
-                        "description": "Can not find ID",
+                    {
+                        "type": "integer",
+                        "description": "Person-to-match ID",
+                        "name": "person_to_match_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
                         "schema": {
                             "$ref": "#/definitions/web.APIError"
                         }
@@ -119,6 +185,34 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "constant.Gender": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "Male",
+                "Female"
+            ]
+        },
+        "model.Person": {
+            "type": "object",
+            "properties": {
+                "dates": {
+                    "type": "integer"
+                },
+                "gender": {
+                    "$ref": "#/definitions/constant.Gender"
+                },
+                "height": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "web.APIError": {
             "type": "object",
             "properties": {
@@ -137,7 +231,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/v2",
+	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "Swagger API",
 	Description:      "API documentation.",
